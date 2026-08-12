@@ -25,7 +25,7 @@ class Task(db.Model):
     title = db.Column(db.String(200), nullable=False)
     description = db.Column(db.Text)
     completed = db.Column(db.Boolean, default=False)
-    priority = db.Column(db.String(20), default='medium')  # low, medium, high
+    priority = db.Column(db.String(20), default='medium')
     due_date = db.Column(db.DateTime)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)

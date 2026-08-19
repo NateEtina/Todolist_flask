@@ -1,169 +1,174 @@
 {% extends "base.html" %}
 
-{% block title %}Dashboard - TaskFlow{% endblock %}
+{% block page_title %}Dashboard{% endblock %}
 
 {% block content %}
-<div class="dashboard-header mb-4">
-    <div class="d-flex justify-content-between align-items-center">
-        <div>
-            <h2 class="fw-bold text-primary">
-                <i class="fas fa-tasks me-2"></i>My Tasks
-            </h2>
-            <p class="text-muted">Organize and manage your tasks efficiently</p>
+<div class="dashboard-content">
+    <!-- Quick Stats -->
+    <div class="row mb-4">
+        <div class="col-md-3 col-6">
+            <div class="stat-card">
+                <h6>Total Tasks</h6>
+                <h3>{{ total_tasks }}</h3>
+            </div>
         </div>
-        <a href="{{ url_for('tasks.new_task') }}" class="btn btn-primary">
-            <i class="fas fa-plus me-2"></i>New Task
-        </a>
+        <div class="col-md-3 col-6">
+            <div class="stat-card">
+                <h6>Completed</h6>
+                <h3>{{ completed_tasks }}</h3>
+            </div>
+        </div>
+        <div class="col-md-3 col-6">
+            <div class="stat-card">
+                <h6>Pending</h6>
+                <h3>{{ pending_tasks }}</h3>
+            </div>
+        </div>
+        <div class="col-md-3 col-6">
+            <div class="stat-card">
+                <h6>Blocked</h6>
+                <h3>{{ blocked_tasks|default(0) }}</h3>
+            </div>
+        </div>
     </div>
-</div>
 
-<!-- Statistics -->
-<div class="row mb-4">
-    <div class="col-md-3 col-6">
-        <div class="stat-card bg-primary text-white p-3 rounded shadow-sm">
-            <div class="d-flex justify-content-between align-items-center">
-                <div>
-                    <h6 class="mb-0 text-light opacity-75">Total Tasks</h6>
-                    <h3 class="mb-0 fw-bold">{{ total_tasks }}</h3>
-                </div>
-                <i class="fas fa-list-ul fs-1 opacity-50"></i>
-            </div>
+    <!-- Filters -->
+    <div class="mb-4">
+        <div class="btn-group flex-wrap" role="group">
+            <a href="{{ url_for('tasks.dashboard', filter='all') }}" 
+               class="btn btn-sm {% if filter_type == 'all' %}active{% endif %}">
+                All
+            </a>
+            <a href="{{ url_for('tasks.dashboard', filter='pending') }}" 
+               class="btn btn-sm {% if filter_type == 'pending' %}active{% endif %}">
+                Pending
+            </a>
+            <a href="{{ url_for('tasks.dashboard', filter='completed') }}" 
+               class="btn btn-sm {% if filter_type == 'completed' %}active{% endif %}">
+                Completed
+            </a>
+            <a href="{{ url_for('tasks.dashboard', filter='blocked') }}" 
+               class="btn btn-sm {% if filter_type == 'blocked' %}active{% endif %}">
+                Blocked
+            </a>
+            <a href="{{ url_for('tasks.dashboard', filter='high') }}" 
+               class="btn btn-sm {% if filter_type == 'high' %}active{% endif %}">
+                High
+            </a>
+            <a href="{{ url_for('tasks.dashboard', filter='medium') }}" 
+               class="btn btn-sm {% if filter_type == 'medium' %}active{% endif %}">
+                Medium
+            </a>
+            <a href="{{ url_for('tasks.dashboard', filter='low') }}" 
+               class="btn btn-sm {% if filter_type == 'low' %}active{% endif %}">
+                Low
+            </a>
         </div>
     </div>
-    <div class="col-md-3 col-6">
-        <div class="stat-card bg-success text-white p-3 rounded shadow-sm">
-            <div class="d-flex justify-content-between align-items-center">
-                <div>
-                    <h6 class="mb-0 text-light opacity-75">Completed</h6>
-                    <h3 class="mb-0 fw-bold">{{ completed_tasks }}</h3>
-                </div>
-                <i class="fas fa-check-circle fs-1 opacity-50"></i>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-3 col-6">
-        <div class="stat-card bg-warning text-dark p-3 rounded shadow-sm">
-            <div class="d-flex justify-content-between align-items-center">
-                <div>
-                    <h6 class="mb-0 opacity-75">Pending</h6>
-                    <h3 class="mb-0 fw-bold">{{ pending_tasks }}</h3>
-                </div>
-                <i class="fas fa-clock fs-1 opacity-50"></i>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-3 col-6">
-        <div class="stat-card bg-info text-white p-3 rounded shadow-sm">
-            <div class="d-flex justify-content-between align-items-center">
-                <div>
-                    <h6 class="mb-0 text-light opacity-75">Completion Rate</h6>
-                    <h3 class="mb-0 fw-bold">
-                        {% if total_tasks > 0 %}
-                            {{ (completed_tasks / total_tasks * 100)|round|int }}%
-                        {% else %}
-                            0%
-                        {% endif %}
-                    </h3>
-                </div>
-                <i class="fas fa-chart-line fs-1 opacity-50"></i>
-            </div>
-        </div>
-    </div>
-</div>
 
-<!-- Filter Bar -->
-<div class="mb-4">
-    <div class="btn-group flex-wrap" role="group">
-        <a href="{{ url_for('tasks.dashboard', filter='all') }}" 
-           class="btn btn-outline-primary {% if filter_type == 'all' %}active{% endif %}">
-            All Tasks
-        </a>
-        <a href="{{ url_for('tasks.dashboard', filter='pending') }}" 
-           class="btn btn-outline-warning {% if filter_type == 'pending' %}active{% endif %}">
-            Pending
-        </a>
-        <a href="{{ url_for('tasks.dashboard', filter='completed') }}" 
-           class="btn btn-outline-success {% if filter_type == 'completed' %}active{% endif %}">
-            Completed
-        </a>
-        <a href="{{ url_for('tasks.dashboard', filter='high') }}" 
-           class="btn btn-outline-danger {% if filter_type == 'high' %}active{% endif %}">
-            High Priority
-        </a>
-        <a href="{{ url_for('tasks.dashboard', filter='medium') }}" 
-           class="btn btn-outline-warning {% if filter_type == 'medium' %}active{% endif %}">
-            Medium Priority
-        </a>
-        <a href="{{ url_for('tasks.dashboard', filter='low') }}" 
-           class="btn btn-outline-info {% if filter_type == 'low' %}active{% endif %}">
-            Low Priority
-        </a>
+    <!-- Project Filter -->
+    {% if projects %}
+    <div class="mb-3">
+        <small class="text-muted">Projects:</small>
+        <div class="btn-group flex-wrap" role="group" style="margin-top: 4px;">
+            <a href="{{ url_for('tasks.dashboard', filter=filter_type) }}" 
+               class="btn btn-sm btn-outline-secondary {% if not current_project %}active{% endif %}">
+                All
+            </a>
+            {% for project in projects %}
+                <a href="{{ url_for('tasks.dashboard', filter=filter_type, project=project.id) }}" 
+                   class="btn btn-sm btn-outline-secondary {% if current_project|string == project.id|string %}active{% endif %}"
+                   style="border-color: {% if current_project|string == project.id|string %}{{ project.color }}{% else %}#e9ecef{% endif %};">
+                    {{ project.name }}
+                </a>
+            {% endfor %}
+        </div>
     </div>
-</div>
+    {% endif %}
 
-<!-- Task List -->
-<div class="task-list">
-    {% if tasks %}
-        {% for task in tasks %}
-            <div class="task-item card mb-3 shadow-sm hover-shadow" data-task-id="{{ task.id }}">
-                <div class="card-body">
-                    <div class="row align-items-center">
-                        <div class="col-md-7">
-                            <div class="d-flex align-items-start">
-                                <div class="form-check me-3">
-                                    <input type="checkbox" class="form-check-input task-complete" 
-                                           {% if task.completed %}checked{% endif %}>
-                                </div>
-                                <div>
-                                    <h5 class="card-title mb-1 {% if task.completed %}text-decoration-line-through text-muted{% endif %}">
-                                        {{ task.title }}
-                                    </h5>
-                                    {% if task.description %}
-                                        <p class="card-text text-muted small mb-1">{{ task.description }}</p>
-                                    {% endif %}
-                                    <div class="d-flex align-items-center gap-2">
-                                        <span class="badge bg-{% if task.priority == 'high' %}danger{% elif task.priority == 'medium' %}warning{% else %}info{% endif %}">
-                                            {{ task.priority|capitalize }}
-                                        </span>
-                                        {% if task.due_date %}
-                                            <small class="text-muted">
-                                                <i class="far fa-calendar-alt me-1"></i>
-                                                Due: {{ task.due_date.strftime('%b %d, %Y %I:%M %p') }}
-                                            </small>
+    <!-- Task List -->
+    <div class="task-list">
+        {% if tasks %}
+            {% for task in tasks %}
+                <div class="task-item card mb-3" data-task-id="{{ task.id }}">
+                    <div class="card-body">
+                        <div class="row align-items-center">
+                            <div class="col-md-8">
+                                <div class="d-flex align-items-start">
+                                    <div class="form-check me-3 mt-1">
+                                        <input type="checkbox" class="form-check-input task-complete" 
+                                               {% if task.completed %}checked{% endif %}
+                                               {% if task.is_blocked() and not task.completed %}disabled{% endif %}>
+                                    </div>
+                                    <div>
+                                        <h6 class="card-title mb-1 {% if task.completed %}text-decoration-line-through text-muted{% endif %}" style="font-weight: 500;">
+                                            {{ task.title }}
+                                            {% if task.project %}
+                                                <span class="badge bg-secondary ms-2" style="font-weight: 400;">
+                                                    {{ task.project.name }}
+                                                </span>
+                                            {% endif %}
+                                        </h6>
+                                        {% if task.description %}
+                                            <p class="card-text text-muted small mb-1">{{ task.description }}</p>
                                         {% endif %}
-                                        <small class="text-muted">
-                                            <i class="far fa-clock me-1"></i>
-                                            {{ task.created_at.strftime('%b %d, %Y') }}
-                                        </small>
+                                        <div class="d-flex align-items-center gap-3 flex-wrap">
+                                            <span class="badge bg-{% if task.priority == 'high' %}danger{% elif task.priority == 'medium' %}warning{% else %}info{% endif %}">
+                                                {{ task.priority|capitalize }}
+                                            </span>
+                                            {% if task.depends_on %}
+                                                <small class="text-muted">
+                                                    <i class="fas fa-link me-1"></i>
+                                                    Depends on: {{ task.depends_on.title }}
+                                                    {% if task.depends_on.completed %}
+                                                        <span class="text-success">✓</span>
+                                                    {% else %}
+                                                        <span class="text-danger">(blocked)</span>
+                                                    {% endif %}
+                                                </small>
+                                            {% endif %}
+                                            {% if task.due_date %}
+                                                <small class="text-muted">
+                                                    <i class="far fa-calendar-alt me-1"></i>
+                                                    {{ task.due_date.strftime('%b %d') }}
+                                                </small>
+                                            {% endif %}
+                                            {% if task.reminder_date %}
+                                                <small class="text-muted">
+                                                    <i class="fas fa-bell me-1"></i>
+                                                    Reminder set
+                                                </small>
+                                            {% endif %}
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                        <div class="col-md-5">
-                            <div class="d-flex gap-2 justify-content-md-end">
-                                <a href="{{ url_for('tasks.edit_task', task_id=task.id) }}" 
-                                   class="btn btn-sm btn-outline-primary">
-                                    <i class="fas fa-edit"></i> Edit
-                                </a>
-                                <button class="btn btn-sm btn-outline-danger delete-task" 
-                                        data-task-id="{{ task.id }}">
-                                    <i class="fas fa-trash"></i> Delete
-                                </button>
+                            <div class="col-md-4">
+                                <div class="d-flex gap-2 justify-content-md-end mt-2 mt-md-0">
+                                    <a href="{{ url_for('tasks.edit_task', task_id=task.id) }}" 
+                                       class="btn btn-sm btn-outline-secondary">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <button class="btn btn-sm btn-outline-secondary delete-task" 
+                                            data-task-id="{{ task.id }}">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
+            {% endfor %}
+        {% else %}
+            <div class="text-center py-5">
+                <i class="fas fa-inbox fa-2x text-muted mb-3 d-block"></i>
+                <h6 class="text-muted">No tasks found</h6>
+                <p class="text-muted small">Create your first task to get started</p>
+                <a href="{{ url_for('tasks.new_task') }}" class="btn btn-primary btn-sm">
+                    <i class="fas fa-plus me-1"></i>Create Task
+                </a>
             </div>
-        {% endfor %}
-    {% else %}
-        <div class="text-center py-5">
-            <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
-            <h4 class="text-muted">No tasks found</h4>
-            <p class="text-muted">Get started by creating your first task!</p>
-            <a href="{{ url_for('tasks.new_task') }}" class="btn btn-primary">
-                <i class="fas fa-plus me-2"></i>Create Task
-            </a>
-        </div>
-    {% endif %}
+        {% endif %}
+    </div>
 </div>
 {% endblock %}

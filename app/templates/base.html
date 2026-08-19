@@ -3,63 +3,90 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}To-Do App{% endblock %}</title>
+    <title>{% block title %}TaskFlow{% endblock %}</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm">
-        <div class="container">
-            <a class="navbar-brand fw-bold" href="{{ url_for('tasks.dashboard') }}">
-                <i class="fas fa-check-circle me-2"></i>TaskFlow
-            </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
-                    {% if current_user.is_authenticated %}
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ url_for('tasks.dashboard') }}">
-                                <i class="fas fa-tasks me-1"></i>Dashboard
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ url_for('tasks.new_task') }}">
-                                <i class="fas fa-plus-circle me-1"></i>New Task
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <span class="nav-link text-light">
-                                <i class="fas fa-user me-1"></i>{{ current_user.username }}
+    <!-- Top Header Bar -->
+    <header class="top-header">
+        <div class="container-fluid">
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <h1 class="page-title">
+                        <i class="fas fa-check-circle me-2"></i>TaskFlow
+                        <span class="page-subtitle">{% block page_title %}Dashboard{% endblock %}</span>
+                    </h1>
+                </div>
+                <div class="col-md-6 text-end">
+                    <div class="header-actions">
+                        {% if current_user.is_authenticated %}
+                            <span class="user-greeting">
+                                <i class="fas fa-user-circle me-1"></i>
+                                {{ current_user.username }}
                             </span>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ url_for('auth.logout') }}">
-                                <i class="fas fa-sign-out-alt me-1"></i>Logout
+                            <a href="{{ url_for('auth.logout') }}" class="btn btn-sm btn-outline-secondary">
+                                <i class="fas fa-sign-out-alt me-1"></i>Sign Out
                             </a>
-                        </li>
-                    {% else %}
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ url_for('auth.login') }}">
+                        {% else %}
+                            <a href="{{ url_for('auth.login') }}" class="btn btn-sm btn-outline-primary">
                                 <i class="fas fa-sign-in-alt me-1"></i>Login
                             </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ url_for('auth.register') }}">
+                            <a href="{{ url_for('auth.register') }}" class="btn btn-sm btn-primary">
                                 <i class="fas fa-user-plus me-1"></i>Register
                             </a>
-                        </li>
-                    {% endif %}
-                </ul>
+                        {% endif %}
+                    </div>
+                </div>
             </div>
         </div>
-    </nav>
+    </header>
 
-    <main class="py-4">
-        <div class="container">
+    <!-- Main Content -->
+    <div class="main-container">
+        <!-- Left Sidebar -->
+        <nav class="left-sidebar">
+            <div class="sidebar-menu">
+                {% if current_user.is_authenticated %}
+                    <a href="{{ url_for('tasks.dashboard') }}" class="sidebar-item {% if request.endpoint == 'tasks.dashboard' %}active{% endif %}">
+                        <i class="fas fa-th-large"></i>
+                        <span>Dashboard</span>
+                    </a>
+                    <a href="{{ url_for('tasks.projects') }}" class="sidebar-item {% if request.endpoint == 'tasks.projects' %}active{% endif %}">
+                        <i class="fas fa-project-diagram"></i>
+                        <span>Projects</span>
+                    </a>
+                    <a href="{{ url_for('tasks.new_task') }}" class="sidebar-item">
+                        <i class="fas fa-plus-circle"></i>
+                        <span>New Task</span>
+                    </a>
+                    <a href="{{ url_for('tasks.new_project') }}" class="sidebar-item">
+                        <i class="fas fa-folder-plus"></i>
+                        <span>New Project</span>
+                    </a>
+                    <div class="sidebar-divider"></div>
+                    <a href="{{ url_for('auth.logout') }}" class="sidebar-item text-danger">
+                        <i class="fas fa-sign-out-alt"></i>
+                        <span>Sign Out</span>
+                    </a>
+                {% else %}
+                    <a href="{{ url_for('auth.login') }}" class="sidebar-item">
+                        <i class="fas fa-sign-in-alt"></i>
+                        <span>Login</span>
+                    </a>
+                    <a href="{{ url_for('auth.register') }}" class="sidebar-item">
+                        <i class="fas fa-user-plus"></i>
+                        <span>Register</span>
+                    </a>
+                {% endif %}
+            </div>
+        </nav>
+
+        <!-- Middle Content Area -->
+        <main class="content-area">
+            <!-- Flash Messages -->
             {% with messages = get_flashed_messages(with_categories=true) %}
                 {% if messages %}
                     {% for category, message in messages %}
@@ -73,8 +100,74 @@
             {% endwith %}
 
             {% block content %}{% endblock %}
-        </div>
-    </main>
+        </main>
+
+        <!-- Right Sidebar -->
+        <aside class="right-sidebar">
+            {% block right_sidebar %}
+            <div class="sidebar-widget">
+                <h6 class="widget-title">
+                    <i class="fas fa-info-circle me-2"></i>Quick Info
+                </h6>
+                {% if current_user.is_authenticated %}
+                    <div class="widget-content">
+                        <div class="info-item">
+                            <span class="info-label">Total Tasks</span>
+                            <span class="info-value">{{ total_tasks|default(0) }}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Completed</span>
+                            <span class="info-value">{{ completed_tasks|default(0) }}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Pending</span>
+                            <span class="info-value">{{ pending_tasks|default(0) }}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Completion Rate</span>
+                            <span class="info-value">
+                                {% if total_tasks|default(0) > 0 %}
+                                    {{ (completed_tasks|default(0) / total_tasks|default(1) * 100)|round|int }}%
+                                {% else %}
+                                    0%
+                                {% endif %}
+                            </span>
+                        </div>
+                        <div class="progress mt-2" style="height: 6px;">
+                            <div class="progress-bar" role="progressbar" 
+                                 style="width: {% if total_tasks|default(0) > 0 %}{{ (completed_tasks|default(0) / total_tasks|default(1) * 100)|round|int }}{% else %}0{% endif %}%; background-color: #6c757d;"
+                                 aria-valuenow="{% if total_tasks|default(0) > 0 %}{{ (completed_tasks|default(0) / total_tasks|default(1) * 100)|round|int }}{% else %}0{% endif %}" 
+                                 aria-valuemin="0" 
+                                 aria-valuemax="100">
+                            </div>
+                        </div>
+                    </div>
+                {% else %}
+                    <div class="widget-content text-muted">
+                        <p class="text-center mb-0">Please login to see your stats</p>
+                    </div>
+                {% endif %}
+            </div>
+
+            {% if current_user.is_authenticated and projects|default([]) %}
+            <div class="sidebar-widget">
+                <h6 class="widget-title">
+                    <i class="fas fa-folder me-2"></i>Recent Projects
+                </h6>
+                <div class="widget-content">
+                    {% for project in projects|default([]) %}
+                        <a href="{{ url_for('tasks.dashboard', project=project.id) }}" class="project-mini">
+                            <span class="project-dot" style="background-color: {{ project.color }};"></span>
+                            <span class="project-name">{{ project.name }}</span>
+                            <span class="project-count">{{ project.tasks|length }}</span>
+                        </a>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+            {% endblock %}
+        </aside>
+    </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
